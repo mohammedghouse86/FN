@@ -1,0 +1,155 @@
+# Basic Label type used in many places
+type Label {
+  id: ID
+  clientId: String
+  orgId: String
+  name: String
+}
+
+# Template Type
+type Template {
+  id: ID
+  title: String
+  description: String
+  type: String
+  uiId: String
+  flowId: String
+  labels: [Label]
+}
+
+# Custom Plan Type
+type CustomPlan {
+  apiLimit: Int
+  workflowLimit: Int
+  apiStepLimit: Int
+  apiKeyLimit: Int
+  webhookLimit: Int
+  webhookRouteLimit: Int
+  appMemberLimit: Int
+  datasourceCacheLimit: Int
+  queuePriority: Int
+  jobLimit: Int
+  jobPeriod: String
+  apiRequestLimit: Int
+  databaseTableLimit: Int
+  databaseSchemaSizeLimit: Int
+  storageLocation: String
+  throttlingTime: Int
+  flowStepsExecutionLimit: Int
+  statementTimes: [String]
+  autoEscape: Boolean
+}
+
+# DB Configuration
+type DBConfig {
+  userName: String
+  password: String
+  host: String
+  databaseName: String
+}
+
+# DB Connection
+type DBConnection {
+  id: ID
+  name: String
+  clientId: String
+  type: String
+  config: DBConfig
+}
+
+# Rate Limiter
+type RateLimiter {
+  timeoutDuration: Int
+  limitRefreshPeriod: String
+  limitForPeriod: Int
+}
+
+# Project Configuration
+type ProjectConfiguration {
+  projectId: String
+  features: [String]
+  customPlan: CustomPlan
+  rateLimiter: RateLimiter
+  dbConnection: DBConnection
+  packageType: String
+}
+
+# API type
+type Api {
+  id: ID
+  clientId: String
+  name: String
+  description: String
+  status: String
+  version: String
+  labels: [String]
+}
+
+# Environment (env vars)
+type Environment {
+  clientId: String
+  env: String
+  isDeletable: Boolean
+}
+
+# JSON data stored
+type JsonInDatastore {
+  id: ID
+  clientId: String
+  name: String
+  data: String
+}
+
+# Secrets
+type SecretKeys {
+  clientId: String
+  secretKeys: [String]
+}
+
+# Input types for queries
+input SearchDataModelInput {
+  clientId: String!
+  first: Int
+  after: String
+  orgId: String
+  connectorId: String
+  query: String
+  isCommunity: Boolean
+}
+
+input GetEntityInput {
+  id: String
+  clientId: String!
+}
+
+input GetListInput {
+  clientId: String!
+}
+
+input ListJsonDataListInput {
+  clientId: String!
+  id: String!
+}
+
+input ImportApiTemplateInput {
+  clientId: String!
+  templateId: String!
+  name: String!
+  orgId: String!
+}
+
+# Root Query
+type Query {
+  listTemplates(input: SearchDataModelInput!): [Template]
+  getProjectConfiguration(input: GetEntityInput!): ProjectConfiguration
+  apis(input: SearchDataModelInput!): [Api]
+  api(input: GetEntityInput!): Api
+  listJsonInDatastore(input: ListJsonDataListInput!): [JsonInDatastore]
+  getEnvs(input: GetListInput!): [Environment]
+  getSecrets(clientId: String!, hide: Boolean): SecretKeys
+}
+
+# Root Mutation
+type Mutation {
+  importApiTemplate(input: ImportApiTemplateInput!): Template
+}
